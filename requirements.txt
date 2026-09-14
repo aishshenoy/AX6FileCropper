@@ -3,3 +3,4 @@ pyedflib
 numpy
 pandas
 matplotlib
+plotly
