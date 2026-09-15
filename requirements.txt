@@ -3,4 +3,8 @@ pyedflib
 numpy
 pandas
 matplotlib
+<<<<<<< Updated upstream
 plotly
+=======
+plotly
+>>>>>>> Stashed changes

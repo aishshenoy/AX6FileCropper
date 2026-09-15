@@ -83,11 +83,11 @@ def extract_segment(input_path, output_path, segment_start, segment_end):
         signal_headers = reader.getSignalHeaders()
         n_signals = reader.signals_in_file
 
-        # ----------------------------------------------------
-        # Determine segment indices for each signal
-        # ----------------------------------------------------
-
         segments = []
+
+        # ----------------------------------------------------
+        # Extract each signal
+        # ----------------------------------------------------
 
         for signal_number in range(n_signals):
 
@@ -140,16 +140,11 @@ def extract_segment(input_path, output_path, segment_start, segment_end):
         try:
 
             writer.setSignalHeaders(signal_headers)
-
-            # Set the new EDF start time
             writer.setStartdatetime(segment_start)
 
-            # Write each signal
-            for signal_number in range(n_signals):
-
-                writer.writePhysicalSamples(
-                    segments[signal_number]
-                )
+            # IMPORTANT:
+            # Write all signals together
+            writer.writeSamples(segments)
 
         finally:
             writer.close()
