@@ -72,8 +72,8 @@ def get_file_info(file_path):
     return info
 
 def extract_segment(input_path, output_path, segment_start, segment_end):
-    """
-    Extract a time segment from an EDF and save it as a new EDF.
+    """Extract a time segment from an EDF and save it as a new EDF
+    while preserving the original EDF metadata.
     """
 
     reader = pyedflib.EdfReader(str(input_path))
@@ -81,14 +81,12 @@ def extract_segment(input_path, output_path, segment_start, segment_end):
     try:
         file_start = reader.getStartdatetime()
         signal_headers = reader.getSignalHeaders()
+        file_header = reader.getHeader()
         n_signals = reader.signals_in_file
 
         segments = []
 
-        # ----------------------------------------------------
         # Extract each signal
-        # ----------------------------------------------------
-
         for signal_number in range(n_signals):
 
             sampling_frequency = reader.getSampleFrequency(
@@ -127,10 +125,7 @@ def extract_segment(input_path, output_path, segment_start, segment_end):
                 np.asarray(segment, dtype=np.float64)
             )
 
-        # ----------------------------------------------------
         # Create new EDF
-        # ----------------------------------------------------
-
         writer = pyedflib.EdfWriter(
             str(output_path),
             n_signals,
@@ -138,12 +133,16 @@ def extract_segment(input_path, output_path, segment_start, segment_end):
         )
 
         try:
+            # Preserve original EDF file-level metadata
+            writer.setHeader(file_header)
 
+            # Preserve signal metadata
             writer.setSignalHeaders(signal_headers)
+
+            # New recording start time
             writer.setStartdatetime(segment_start)
 
-            # IMPORTANT:
-            # Write all signals together
+            # Write all signals
             writer.writeSamples(segments)
 
         finally:
